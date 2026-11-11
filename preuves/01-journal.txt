@@ -1,0 +1,42 @@
+$ kafka-topics.sh --create --topic commandes --partitions 3 --replication-factor 3 
+Created topic commandes.
+6 messages envoyes, dans cet ordre :
+  1 client-A commande 1 creee | 2 client-B commande 2 creee | 3 client-A commande 1 payee
+  4 client-C commande 3 creee | 5 client-B commande 2 payee | 6 client-A commande 1 expediee
+
+--- groupe facturation, 1re lecture
+Partition:1	Offset:0	client-A	commande 1 creee
+Partition:1	Offset:1	client-B	commande 2 creee
+Partition:1	Offset:2	client-A	commande 1 payee
+Partition:1	Offset:3	client-B	commande 2 payee
+Partition:1	Offset:4	client-A	commande 1 expediee
+Partition:2	Offset:0	client-C	commande 3 creee
+Processed a total of 6 messages
+
+--- groupe stock, 1re lecture
+Partition:1	Offset:0	client-A	commande 1 creee
+Partition:1	Offset:1	client-B	commande 2 creee
+Partition:1	Offset:2	client-A	commande 1 payee
+Partition:1	Offset:3	client-B	commande 2 payee
+Partition:1	Offset:4	client-A	commande 1 expediee
+Partition:2	Offset:0	client-C	commande 3 creee
+Processed a total of 6 messages
+
+--- groupe facturation, 2e lecture
+Processed a total of 0 messages
+
+$ kafka-consumer-groups.sh --group facturation --topic commandes --reset-offsets --to-earliest --execute
+
+GROUP           TOPIC           PARTITION  NEW-OFFSET
+facturation     commandes       0          0
+facturation     commandes       1          0
+facturation     commandes       2          0
+
+--- groupe facturation, apres remise a zero
+Partition:1	Offset:0	client-A	commande 1 creee
+Partition:1	Offset:1	client-B	commande 2 creee
+Partition:1	Offset:2	client-A	commande 1 payee
+Partition:1	Offset:3	client-B	commande 2 payee
+Partition:1	Offset:4	client-A	commande 1 expediee
+Partition:2	Offset:0	client-C	commande 3 creee
+Processed a total of 6 messages

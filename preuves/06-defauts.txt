@@ -1,0 +1,20 @@
+Broker (kafka-configs.sh --entity-type brokers --entity-name 1 --describe --all) :
+  default.replication.factor=1
+  group.consumer.heartbeat.interval.ms=5000
+  group.consumer.session.timeout.ms=45000
+  group.share.delivery.count.limit=5
+  group.share.record.lock.duration.ms=30000
+  log.retention.hours=168
+  min.insync.replicas=1
+  num.partitions=1
+
+Clients (documentation embarquee dans kafka-clients-4.4.0.jar) :
+  ProducerConfig acks = all
+  ProducerConfig enable.idempotence = true
+  ConsumerConfig enable.auto.commit = true
+  ConsumerConfig auto.commit.interval.ms = 5000 (5 seconds)
+  ConsumerConfig max.poll.records = 500
+  ConsumerConfig auto.offset.reset = latest
+  ConsumerConfig share.acquire.mode = BATCH_OPTIMIZED
+  ConsumerConfig group.protocol = classic
+  ConsumerConfig session.timeout.ms = 45000 (45 seconds)

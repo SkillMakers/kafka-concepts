@@ -1,0 +1,36 @@
+$ kafka-topics.sh --create --topic expeditions --partitions 1 --replication-factor 3 
+Created topic expeditions.
+10 messages envoyes
+
+--- le consommateur du groupe colis traite les 10 messages, puis on le tue (kill -9) aussitot
+Offset:0	expedier la commande 1
+Offset:1	expedier la commande 2
+Offset:2	expedier la commande 3
+Offset:3	expedier la commande 4
+Offset:4	expedier la commande 5
+Offset:5	expedier la commande 6
+Offset:6	expedier la commande 7
+Offset:7	expedier la commande 8
+Offset:8	expedier la commande 9
+Offset:9	expedier la commande 10
+messages traites avant le crash : 10
+
+$ kafka-consumer-groups.sh --describe --group colis --offsets
+TOPIC PARTITION CURRENT-OFFSET LOG-END-OFFSET LAG
+expeditions 0 - 10 -
+
+--- redemarrage du meme groupe colis (aucun offset enregistre : il repart du debut)
+Partition:0	Offset:0	commande-1	expedier la commande 1
+Partition:0	Offset:1	commande-2	expedier la commande 2
+Partition:0	Offset:2	commande-3	expedier la commande 3
+Partition:0	Offset:3	commande-4	expedier la commande 4
+Partition:0	Offset:4	commande-5	expedier la commande 5
+Partition:0	Offset:5	commande-6	expedier la commande 6
+Partition:0	Offset:6	commande-7	expedier la commande 7
+Partition:0	Offset:7	commande-8	expedier la commande 8
+Partition:0	Offset:8	commande-9	expedier la commande 9
+Partition:0	Offset:9	commande-10	expedier la commande 10
+Processed a total of 10 messages
+(les messages sont arrives 46 s apres le redemarrage : le consommateur tue occupait encore la partition)
+
+messages traites deux fois : 10

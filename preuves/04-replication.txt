@@ -1,0 +1,31 @@
+$ kafka-topics.sh --create --topic factures --replica-assignment 3:1:2 --config min.insync.replicas=2
+Created topic factures.
+$ kafka-topics.sh --describe --topic factures
+  Partition: 0  Leader: 3  Replicas: 3,1,2  Isr: 3,1,2
+
+$ docker stop kafka-3      (le leader de la partition)
+$ kafka-topics.sh --describe --topic factures
+  Partition: 0  Leader: 1  Replicas: 3,1,2  Isr: 1,2
+
+--- envoi avec acks=all, min.insync.replicas=2 (2 replicas a jour sur 3)
+=> ACCEPTE : « facture 1 »
+
+$ kafka-configs.sh --alter --entity-type topics --entity-name factures --add-config min.insync.replicas=3
+Completed updating config for topic factures.
+
+--- envoi avec acks=all, min.insync.replicas=3 (il n en reste que 2)
+Messages are rejected since there are fewer in-sync replicas than required.
+NotEnoughReplicasException
+=> REFUSE : « facture 2 »
+
+--- envoi avec acks=1 (seul le leader confirme)
+=> ACCEPTE : « facture 3 »
+
+$ docker start kafka-3
+$ kafka-topics.sh --describe --topic factures
+  Partition: 0  Leader: 1  Replicas: 3,1,2  Isr: 1,2,3
+
+--- contenu du topic
+Partition:0	Offset:0	null	facture 1
+Partition:0	Offset:1	null	facture 3
+Processed a total of 2 messages

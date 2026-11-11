@@ -1,0 +1,26 @@
+$ kafka-topics.sh --create --topic paiements --partitions 3 --replication-factor 3 
+Created topic paiements.
+4 consommateurs lances dans le groupe encaissement (protocole consumer, KIP-848)
+
+$ kafka-consumer-groups.sh --describe --group encaissement --members --verbose
+  consommateur-1   partitions : paiements:0
+  consommateur-2   partitions : paiements:2
+  consommateur-3   partitions : -
+  consommateur-4   partitions : paiements:1
+
+On tue le consommateur qui lisait la partition 0 (kill -9)
+consommateur-1 (qui lisait paiements-0) arrete par kill -9
+paiements-0 reprise par consommateur-3 au bout de 46.5 s
+
+$ kafka-consumer-groups.sh --describe --group encaissement --members --verbose
+  consommateur-2   partitions : paiements:2
+  consommateur-3   partitions : paiements:0
+  consommateur-4   partitions : paiements:1
+
+Cette fois on arrete proprement celui qui lit la partition 0 (kill, signal TERM : il quitte le groupe)
+consommateur-3 (qui lisait paiements-0) arrete par kill (TERM)
+paiements-0 reprise par consommateur-2 au bout de 2.5 s
+
+$ kafka-consumer-groups.sh --describe --group encaissement --members --verbose
+  consommateur-2   partitions : paiements:0,2
+  consommateur-4   partitions : paiements:1

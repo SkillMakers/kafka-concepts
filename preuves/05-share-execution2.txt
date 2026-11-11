@@ -1,0 +1,45 @@
+$ kafka-topics.sh --create --topic emails --partitions 1 --replication-factor 3 
+Created topic emails.
+60 messages envoyes
+
+--- groupe CLASSIQUE « notifications » (KafkaConsumer)
+termine en 40 s (chaque consommateur tourne 40 s)
+  consommateur-1 :  0 messages traites
+  consommateur-2 :  0 messages traites
+  consommateur-3 : 60 messages traites
+  du 1er au dernier message traite : 11.9 s
+  les 6 premiers messages :
+    consommateur-3 traite email 1 (partition 0, offset 0)
+    consommateur-3 traite email 2 (partition 0, offset 1)
+    consommateur-3 traite email 3 (partition 0, offset 2)
+    consommateur-3 traite email 4 (partition 0, offset 3)
+    consommateur-3 traite email 5 (partition 0, offset 4)
+    consommateur-3 traite email 6 (partition 0, offset 5)
+
+--- SHARE GROUP « notifications-defaut » (KafkaShareConsumer, reglages par defaut : share.acquire.mode=batch_optimized)
+termine en 41 s (chaque consommateur tourne 40 s)
+  consommateur-1 :  0 messages traites
+  consommateur-2 : 60 messages traites
+  consommateur-3 :  0 messages traites
+  du 1er au dernier message traite : 11.9 s
+  les 6 premiers messages :
+    consommateur-2 traite email 1 (partition 0, offset 0)
+    consommateur-2 traite email 2 (partition 0, offset 1)
+    consommateur-2 traite email 3 (partition 0, offset 2)
+    consommateur-2 traite email 4 (partition 0, offset 3)
+    consommateur-2 traite email 5 (partition 0, offset 4)
+    consommateur-2 traite email 6 (partition 0, offset 5)
+
+--- SHARE GROUP « notifications-partage » (KafkaShareConsumer, share.acquire.mode=record_limit, max.poll.records=5)
+termine en 41 s (chaque consommateur tourne 40 s)
+  consommateur-1 : 20 messages traites
+  consommateur-2 : 20 messages traites
+  consommateur-3 : 20 messages traites
+  du 1er au dernier message traite : 3.9 s
+  les 6 premiers messages :
+    consommateur-1 traite email 1 (partition 0, offset 0)
+    consommateur-2 traite email 6 (partition 0, offset 5)
+    consommateur-3 traite email 11 (partition 0, offset 10)
+    consommateur-1 traite email 2 (partition 0, offset 1)
+    consommateur-2 traite email 7 (partition 0, offset 6)
+    consommateur-3 traite email 12 (partition 0, offset 11)

@@ -1,0 +1,10 @@
+$ kafka-topics.sh --create --topic clients --partitions 3 --replication-factor 3 
+Created topic clients.
+$ kafka-topics.sh --alter --topic clients --partitions 4
+cle        avec 3 partitions          avec 4 partitions
+client-A   partition 1                partition 1
+client-B   partition 1                partition 0   <- a change
+client-C   partition 2                partition 3   <- a change
+client-D   partition 0                partition 0
+client-E   partition 2                partition 2
+client-F   partition 2                partition 1   <- a change
